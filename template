@@ -1,6 +1,6 @@
 <VirtualHost *:80>
-  ServerName HEI.school
-  DocumentRoot /var/www/HEI.school
+  ServerName {{ domain_names }}
+  DocumentRoot /var/www/{{ domain_names }}
   ErrorLog ${APACHE_LOG_DIR}/error.log
   CustomLog ${APACHE_LOG_DIR}/access.log combined
  </VirtualHost>
