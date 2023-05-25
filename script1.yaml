@@ -1,0 +1,47 @@
+---
+- name: Create Virtual Hosts
+  hosts: localhost
+  become: yes
+  vars:
+    domain_names_file: "{{ domain_names_file_path }}"
+    apache_service_name: "apache2"
+
+  tasks:
+    - name: Install Apache2
+      apt:
+        name: "apache2"
+        update_cache: yes
+        state: latest
+    
+    - name: Enable mod_rewrite
+      apache2_module:
+        name: rewrite
+        state: present
+      notify:
+        - restart apache2
+
+    - name: Read domain names from file
+      set_fact:
+        domain_names: "{{ lookup('file', domain_names_file) | splitlines }}"
+
+    - name: Create virtual hosts
+      template:
+        src: virtual_hosts.j2
+        dest: "/etc/apache2/sites-available/{{ item }}.conf"
+      loop: "{{ domain_names }}"
+      notify:
+        - enable virtual host
+
+  handlers:
+    - name: restart apache2
+      service:
+        name: "{{ apache_service_name }}"
+        state: restarted
+
+    - name: enable virtual host
+      command: a2ensite "{{ item }}.conf"
+      args:
+        chdir: "/etc/apache2/sites-available"
+      notify:
+        - restart apache2
+---
