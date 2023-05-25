@@ -27,7 +27,7 @@
 
     - name: Create virtual hosts
       template:
-        src: virtual_hosts.j2
+        src: virtualhosts.conf.j2
         dest: "/etc/apache2/sites-available/{{ item }}.conf"
       loop: "{{ domain_names }}"
       notify:
